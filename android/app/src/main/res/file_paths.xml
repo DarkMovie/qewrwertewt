@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- دسترسی به پوشه تصاویر داخلی برنامه -->
+    <files-path
+        name="internal_files"
+        path="." />
+
+    <!-- دسترسی به پوشه cache -->
+    <cache-path
+        name="cache_files"
+        path="." />
+
+    <!-- دسترسی به پوشه external files -->
+    <external-files-path
+        name="external_files"
+        path="." />
+
+    <!-- دسترسی به پوشه external cache -->
+    <external-cache-path
+        name="external_cache"
+        path="." />
+
+</paths>
