@@ -45,5 +45,19 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+
+	<!-- 📸 دسترسی‌های موردنیاز برای image_picker -->
+	<key>NSCameraUsageDescription</key>
+	<string>این اپلیکیشن برای گرفتن عکس نیاز به دسترسی به دوربین دارد.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>این اپلیکیشن برای انتخاب تصویر نیاز به دسترسی به گالری دارد.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>این اپلیکیشن برای ذخیره عکس نیاز به دسترسی به گالری دارد.</string>
+
+	<!-- 📁 دسترسی اختیاری برای file_picker -->
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+	<key>UIFileSharingEnabled</key>
+	<true/>
 </dict>
 </plist>
