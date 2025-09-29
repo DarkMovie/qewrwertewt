@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.azmonrahnamayi.fazli"
-    compileSdk = 33   // 👈 مطمئن شو حداقل 33 باشه
+    compileSdk = 35
     ndkVersion = "27.0.12077973"
 
     compileOptions {
@@ -21,8 +21,8 @@ android {
 
     defaultConfig {
         applicationId = "com.azmonrahnamayi.fazli"
-        minSdk = 21          // می‌تونی بذاری flutter.minSdkVersion هم
-        targetSdk = 33       // یا flutter.targetSdkVersion
+        minSdk = 21
+        targetSdk = 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
@@ -40,5 +40,5 @@ flutter {
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22")
-    implementation("com.google.android.material:material:1.12.0")   // ✅ اضافه شد
+    implementation("com.google.android.material:material:1.12.0")
 }
