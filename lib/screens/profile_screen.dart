@@ -5,8 +5,10 @@ import 'dart:io';
 import 'package:azmonrahnamayi/models/user.dart';
 import 'package:azmonrahnamayi/services/user_service.dart';
 import 'package:azmonrahnamayi/screens/home_screen.dart';
+import 'package:azmonrahnamayi/screens/sources_screen.dart'; // اضافه کردن صفحه منابع
 import 'package:azmonrahnamayi/services/image_service.dart';
 import 'package:azmonrahnamayi/utils/web_image_dialog.dart';
+import 'package:azmonrahnamayi/utils/constants.dart'; // اضافه کردن ثابت‌ها
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -258,6 +260,14 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
+  // متد جدید برای هدایت به صفحه منابع
+  void _navigateToSources() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const SourcesScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
@@ -435,6 +445,10 @@ class _ProfileScreenState extends State<ProfileScreen>
 
         // دکمه‌ها
         _buildActionButtons(buttonHeight, buttonFontSize, spacing),
+
+        // اضافه کردن بخش منابع و حریم خصوصی
+        SizedBox(height: spacing * 0.5),
+        _buildSourcesSection(spacing),
       ],
     );
   }
@@ -759,6 +773,99 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
+  // اضافه کردن بخش منابع و حریم خصوصی
+  Widget _buildSourcesSection(double spacing) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(spacing * 0.75),
+      decoration: BoxDecoration(
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.grey.shade800.withOpacity(0.8)
+            : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.source,
+                color: Theme.of(context).colorScheme.primary,
+                size: 24,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'منابع و حریم خصوصی',
+                  style: GoogleFonts.vazirmatn(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: spacing * 0.5),
+          Text(
+            AppConstants.contentSource,
+            style: GoogleFonts.vazirmatn(
+              fontSize: 14,
+              height: 1.5,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.grey[300]
+                  : Colors.grey[700],
+            ),
+          ),
+          SizedBox(height: spacing * 0.5),
+          Text(
+            AppConstants.privacyPolicyOffline,
+            style: GoogleFonts.vazirmatn(
+              fontSize: 14,
+              height: 1.5,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.grey[300]
+                  : Colors.grey[700],
+            ),
+          ),
+          SizedBox(height: spacing * 0.5),
+          InkWell(
+            onTap: _navigateToSources,
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(vertical: spacing * 0.4),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Center(
+                child: Text(
+                  'مشاهده جزئیات',
+                  style: GoogleFonts.vazirmatn(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showHelpDialog() {
     showDialog(
       context: context,
@@ -768,7 +875,8 @@ class _ProfileScreenState extends State<ProfileScreen>
           style: GoogleFonts.vazirmatn(fontWeight: FontWeight.bold),
         ),
         content: Text(
-          'شما می‌توانید اطلاعات پروفایل خود را ویرایش کنید یا این مرحله را رد کنید.',
+          'شما می‌توانید اطلاعات پروفایل خود را ویرایش کنید یا این مرحله را رد کنید. '
+          'همچنین می‌توانید منابع محتوا و سیاست حریم خصوصی برنامه را مشاهده کنید.',
           style: GoogleFonts.vazirmatn(),
         ),
         actions: [
