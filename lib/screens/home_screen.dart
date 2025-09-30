@@ -10,15 +10,16 @@ import 'package:azmonrahnamayi/screens/history_screen.dart';
 import 'package:azmonrahnamayi/screens/question_screen.dart';
 import 'package:azmonrahnamayi/screens/question_count_screen.dart';
 import 'package:azmonrahnamayi/screens/profile_screen.dart';
+import 'package:azmonrahnamayi/screens/sources_screen.dart';
 import 'package:azmonrahnamayi/utils/constants.dart';
 import 'package:azmonrahnamayi/widgets/styled_button.dart';
 import 'package:azmonrahnamayi/widgets/booklet_card.dart';
 import 'package:azmonrahnamayi/models/user.dart';
 import 'package:azmonrahnamayi/services/user_service.dart';
 import 'package:azmonrahnamayi/services/test_history_service.dart';
-import 'package:azmonrahnamayi/services/image_service.dart'; // اضافه کردن سرویس تصویر
+import 'package:azmonrahnamayi/services/image_service.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'dart:io'; // اضافه کردن برای کار با فایل‌ها
+import 'dart:io';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:share_plus/share_plus.dart';
@@ -35,18 +36,25 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   bool _isLoading = false;
   final UserService _userService = UserService();
   final TestHistoryService _testHistoryService = TestHistoryService();
-  final ImageService _imageService = ImageService(); // اضافه کردن سرویس تصویر
+  final ImageService _imageService = ImageService();
   User? _user;
   int _testHistoryCount = 0;
+  bool _showSourceBanner = false;
 
   late AnimationController _shimmerController;
+  late AnimationController _bannerController;
   late Animation<double> _shimmerAnimation;
+  late Animation<Offset> _bannerAnimation;
 
   @override
   void initState() {
     super.initState();
     _loadUserData();
+    _checkFirstTime();
+    _initAnimations();
+  }
 
+  void _initAnimations() {
     // انیمیشن شاینر برای تیک آبی
     _shimmerController = AnimationController(
       duration: const Duration(milliseconds: 2000),
@@ -57,11 +65,50 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       end: 1.0,
     ).animate(CurvedAnimation(parent: _shimmerController, curve: Curves.ease));
     _shimmerController.repeat();
+
+    // انیمیشن بنر منبع
+    _bannerController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    _bannerAnimation =
+        Tween<Offset>(begin: const Offset(0, -1.5), end: Offset.zero).animate(
+          CurvedAnimation(parent: _bannerController, curve: Curves.elasticOut),
+        );
+  }
+
+  Future<void> _checkFirstTime() async {
+    final hasSeen = await _userService.hasSeenSourceBanner();
+    if (!hasSeen) {
+      setState(() {
+        _showSourceBanner = true;
+      });
+      _bannerController.forward();
+
+      // بعد از 10 ثانیه به صورت خودکار بسته شود
+      Future.delayed(const Duration(seconds: 10), () {
+        if (mounted && _showSourceBanner) {
+          _dismissSourceBanner();
+        }
+      });
+    }
+  }
+
+  void _dismissSourceBanner() async {
+    await _userService.setSeenSourceBanner();
+    _bannerController.reverse().then((_) {
+      if (mounted) {
+        setState(() {
+          _showSourceBanner = false;
+        });
+      }
+    });
   }
 
   @override
   void dispose() {
     _shimmerController.dispose();
+    _bannerController.dispose();
     super.dispose();
   }
 
@@ -78,13 +125,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     Share.share(
       'برنامه آزمون رهنمایی رانندگی را دانلود کنید!\n\n'
       'آماده شوید برای آزمون آیین نامه راهنمایی و رانندگی با مجموعه کامل سوالات.\n\n'
-      'دانلود از: https://ehsanjs.ir/azmoon',
+      'دانلود از: ${AppConstants.developerWebsite}/azmoon',
       subject: 'آزمون رهنمایی رانندگی',
     );
   }
 
   void _rateApp() async {
-    const url = 'https://ehsanjs.ir/azmoon';
+    final url = 'https://${AppConstants.developerWebsite}/azmoon';
     if (await canLaunchUrl(Uri.parse(url))) {
       await launchUrl(Uri.parse(url));
     } else {
@@ -266,64 +313,129 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         ),
       ),
       drawer: _buildDrawer(context, isTablet, isMediumPhone, isDarkMode),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Theme.of(context).colorScheme.primary.withOpacity(0.05),
-              Theme.of(context).scaffoldBackgroundColor,
-            ],
-            stops: const [0.0, 0.3],
-          ),
-        ),
-        child: SafeArea(
-          top: false,
-          bottom: false,
-          child: Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.only(
-                  top: isSmallPhone ? 12.0 : 16.0,
-                  left: cardPadding,
-                  right: cardPadding,
-                  bottom: cardPadding,
-                ),
-                child: _buildRandomTestCard(
-                  context,
-                  isTablet,
-                  isMediumPhone,
-                  cardTitleSize,
-                  cardSubtitleSize,
-                  buttonFontSize,
-                  buttonPadding,
-                  isDarkMode,
-                ),
+      body: Stack(
+        children: [
+          // محتوای اصلی برنامه
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Theme.of(context).colorScheme.primary.withOpacity(0.05),
+                  Theme.of(context).scaffoldBackgroundColor,
+                ],
+                stops: const [0.0, 0.3],
               ),
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    left: cardPadding,
-                    right: cardPadding,
-                    bottom: bottomPadding > 0 ? bottomPadding + 8.0 : 8.0,
+            ),
+            child: SafeArea(
+              top: false,
+              bottom: false,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(
+                      top: isSmallPhone ? 12.0 : 16.0,
+                      left: cardPadding,
+                      right: cardPadding,
+                      bottom: cardPadding,
+                    ),
+                    child: _buildRandomTestCard(
+                      context,
+                      isTablet,
+                      isMediumPhone,
+                      cardTitleSize,
+                      cardSubtitleSize,
+                      buttonFontSize,
+                      buttonPadding,
+                      isDarkMode,
+                    ),
                   ),
-                  child: _buildBookletsSection(
-                    context,
-                    isTablet,
-                    isMediumPhone,
-                    sectionTitleSize,
-                    badgeSize,
-                    gridPadding,
-                    gridSpacing,
-                    screenHeight,
-                    isDarkMode,
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        left: cardPadding,
+                        right: cardPadding,
+                        bottom: bottomPadding > 0 ? bottomPadding + 8.0 : 8.0,
+                      ),
+                      child: _buildBookletsSection(
+                        context,
+                        isTablet,
+                        isMediumPhone,
+                        sectionTitleSize,
+                        badgeSize,
+                        gridPadding,
+                        gridSpacing,
+                        screenHeight,
+                        isDarkMode,
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
+
+          // بنر منبع (فقط برای اولین ورود)
+          if (_showSourceBanner)
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: SlideTransition(
+                position: _bannerAnimation,
+                child: _buildSourceBanner(),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  // بنر منبع برای اولین ورود
+  Widget _buildSourceBanner() {
+    return Container(
+      margin: const EdgeInsets.only(top: kToolbarHeight + 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Theme.of(context).colorScheme.primary,
+            Theme.of(context).colorScheme.secondary,
+          ],
         ),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(16),
+          bottomRight: Radius.circular(16),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.info, color: Colors.white, size: 24),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              AppConstants.contentSource,
+              style: GoogleFonts.vazirmatn(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.close, color: Colors.white),
+            onPressed: _dismissSourceBanner,
+            tooltip: 'بستن',
+          ),
+        ],
       ),
     );
   }
@@ -690,6 +802,23 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                   _buildDrawerItem(
                     context,
+                    icon: Icons.source,
+                    title: 'منابع و حریم خصوصی',
+                    iconSize: iconSize,
+                    fontSize: itemFontSize,
+                    isDarkMode: isDarkMode,
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SourcesScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  _buildDrawerItem(
+                    context,
                     icon: Icons.share,
                     title: 'اشتراک گذاری',
                     iconSize: iconSize,
@@ -739,7 +868,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         ),
                       ),
                       Text(
-                        ' 1.0.0',
+                        ' ${AppConstants.appVersion}',
                         style: GoogleFonts.vazirmatn(
                           color: isDarkMode
                               ? Colors.grey[300]
@@ -752,7 +881,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'تمامی حقوق محفوظ است © 2025',
+                    AppConstants.copyrightNotice,
                     style: GoogleFonts.vazirmatn(
                       color: isDarkMode ? Colors.grey[500] : Colors.grey[600],
                       fontSize: isTablet ? 12.0 : 10.0,
@@ -1135,7 +1264,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                '10 دفترچه',
+                '${AppConstants.bookletCount} دفترچه',
                 style: GoogleFonts.vazirmatn(
                   fontSize: badgeFontSize,
                   fontWeight: FontWeight.bold,
@@ -1156,7 +1285,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               crossAxisSpacing: gridSpacing,
               mainAxisSpacing: gridSpacing,
             ),
-            itemCount: 10,
+            itemCount: AppConstants.bookletCount,
             itemBuilder: (context, index) {
               return BookletCard(
                 number: index + 1,
