@@ -6,6 +6,7 @@ import 'dart:convert';
 class UserService {
   static const String _userKey = 'user_data';
   static const String _isLoggedInKey = 'is_logged_in';
+  static const String _seenSourceBannerKey = 'seen_source_banner'; // کلید جدید
 
   Future<void> saveUser(User user) async {
     final prefs = await SharedPreferences.getInstance();
@@ -45,5 +46,16 @@ class UserService {
   Future<bool> isLoggedIn() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool(_isLoggedInKey) ?? false;
+  }
+
+  // متدهای جدید برای مدیریت بنر منبع
+  Future<bool> hasSeenSourceBanner() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_seenSourceBannerKey) ?? false;
+  }
+
+  Future<void> setSeenSourceBanner() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_seenSourceBannerKey, true);
   }
 }
