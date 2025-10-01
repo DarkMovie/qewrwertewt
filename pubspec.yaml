@@ -1,5 +1,5 @@
 name: azmonrahnamayi
-description: "A new Flutter project."
+description: "azmonrahnamayi"
 publish_to: 'none'
 
 version: 1.0.0+1
@@ -58,5 +58,6 @@ flutter:
     - assets/images/avatar.png
     - assets/images/logo.png
     - assets/images/nexzo.png
+
 
 
