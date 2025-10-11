@@ -11,7 +11,7 @@ class AppConstants {
   static const String teamName = 'نکزو تیم';
   static const String teamWebsite = 'nexzo.ir';
   static const String teamAppWebsite = 'azmoon.nexzo.ir';
-  static const String teamSupportEmail = 'support@nexzo.ir';
+  static const String teamSupportEmail = 'ehsanfazlinejad@gmail.com';
 
   // منابع محتوا
   static const String contentSource =
@@ -86,3 +86,4 @@ class AppConstants {
     return '$imagesAssetPath/$imageName';
   }
 }
+
