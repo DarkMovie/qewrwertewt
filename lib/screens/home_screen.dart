@@ -131,10 +131,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   void _rateApp() async {
-    final url = 'https://${AppConstants.developerWebsite}/azmoon';
-    if (await canLaunchUrl(Uri.parse(url))) {
-      await launchUrl(Uri.parse(url));
-    } else {
+    // لینک مستقیم مایکت برای امتیازدهی
+    final myketUrl = 'https://myket.ir/app/com.azmonrahnamayi.fazli';
+    
+    // لینک جایگزین (وب‌سایت توسعه‌دهنده)
+    final fallbackUrl = 'https://${AppConstants.developerWebsite}/azmoon';
+    
+    // تلاش برای باز کردن لینک مایکت
+    if (await canLaunchUrl(Uri.parse(myketUrl))) {
+      await launchUrl(Uri.parse(myketUrl));
+    } 
+    // اگر لینک مایکت باز نشد، لینک جایگزین را امتحان کن
+    else if (await canLaunchUrl(Uri.parse(fallbackUrl))) {
+      await launchUrl(Uri.parse(fallbackUrl));
+    } 
+    // اگر هیچ‌کدام باز نشد، پیام خطا نمایش بده
+    else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('خطا در باز کردن لینک', style: GoogleFonts.vazirmatn()),
