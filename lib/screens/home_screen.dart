@@ -130,32 +130,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  void _rateApp() async {
-    // لینک مستقیم مایکت برای امتیازدهی
-    final myketUrl = 'https://myket.ir/app/com.azmonrahnamayi.fazli';
-    
-    // لینک جایگزین (وب‌سایت توسعه‌دهنده)
-    final fallbackUrl = 'https://${AppConstants.developerWebsite}/azmoon';
-    
-    // تلاش برای باز کردن لینک مایکت
-    if (await canLaunchUrl(Uri.parse(myketUrl))) {
-      await launchUrl(Uri.parse(myketUrl));
-    } 
-    // اگر لینک مایکت باز نشد، لینک جایگزین را امتحان کن
-    else if (await canLaunchUrl(Uri.parse(fallbackUrl))) {
-      await launchUrl(Uri.parse(fallbackUrl));
-    } 
-    // اگر هیچ‌کدام باز نشد، پیام خطا نمایش بده
-    else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('خطا در باز کردن لینک', style: GoogleFonts.vazirmatn()),
-          duration: const Duration(seconds: 2),
-        ),
-      );
-    }
-  }
-
   Future<void> _navigateToProfile() async {
     final result = await Navigator.push(
       context,
@@ -839,18 +813,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     onTap: () {
                       Navigator.pop(context);
                       _shareApp();
-                    },
-                  ),
-                  _buildDrawerItem(
-                    context,
-                    icon: Icons.star,
-                    title: 'امتیاز به برنامه',
-                    iconSize: iconSize,
-                    fontSize: itemFontSize,
-                    isDarkMode: isDarkMode,
-                    onTap: () {
-                      Navigator.pop(context);
-                      _rateApp();
                     },
                   ),
                 ],
