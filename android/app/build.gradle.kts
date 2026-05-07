@@ -23,8 +23,8 @@ android {
         applicationId = "com.azmonrahnamayi.fazli"
         minSdk = 21
         targetSdk = 35
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        versionCode = 2
+        versionName = "1.1.3"
     }
 
     buildTypes {
